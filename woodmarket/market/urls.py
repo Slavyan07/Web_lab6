@@ -1,7 +1,8 @@
 from django.urls import path
-from market import views
+
+from .views import index
+
 
 urlpatterns = [
- path('', views.index),
- path('cats/', views.categories)
+    path('', index),
 ]
