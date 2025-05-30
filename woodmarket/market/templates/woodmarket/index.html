@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>{{ title }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-  <ul>
-    <li><a href="{% url 'home' %}">Главная</a></li>
-    {% for item in menu %}
-      {% if not forloop.last %}
-        <li><a href="{% url item.url_name %}">{{ item.title }}</a></li>
-      {% else %}
-        <li class="last"><a href="{% url item.url_name %}">{{ item.title }}</a></li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+{% block content %}
+<!--  {% include 'woodmarket/includes/nav.html' %}-->
 
   <h1>{{ title }}</h1>
 
@@ -23,7 +10,11 @@
       {% if product.is_published %}
         <li>
           <h2>{{ product.title }}</h2>
-          <p>{{ product.description }}</p>
+          <p>
+            {% autoescape off %}
+              {{ product.description|linebreaks|truncatewords:50 }}
+            {% endautoescape %}
+          </p>
           <p><a href="{% url 'product' product.id %}">Читать подробнее</a></p>
           {% if not forloop.last %}
             <hr>
@@ -33,5 +24,34 @@
     {% endfor %}
   </ul>
 
+<!--  {% include 'woodmarket/includes/nav.html' %}-->
+{% endblock %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ main_title|default:"Без заголовка" }}</title>
+</head>
+<body>
+    <h1>{{ title|capfirst }}</h1>
+
+    <h2>Фильтры</h2>
+
+    <p><strong>Float + 50:</strong> {{ float|add:"50" }}</p>
+    <p><strong>Float делится на 2?</strong> {{ float|divisibleby:"2" }}</p>
+
+    <p><strong>Список:</strong> {{ lst }}</p>
+    <p><strong>Длина списка:</strong> {{ lst|length }}</p>
+
+    <p><strong>Первый элемент списка:</strong> {{ lst|first }}</p>
+    <p><strong>Последний элемент списка:</strong> {{ lst|last }}</p>
+
+    <p><strong>Меню:</strong> {{ menu|join:" | " }}</p>
+
+    <p><strong>Title в верхнем регистре:</strong> {{ title|upper }}</p>
+    <p><strong>Title без пробелов:</strong> {{ title|cut:" " }}</p>
+
+    <p><strong>Слаг URL:</strong> {{ url }}</p>
 </body>
 </html>
