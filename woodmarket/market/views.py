@@ -1,6 +1,6 @@
 from django.http import  HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Product
 # Create your views here.
 menu = [
     {'title': "О сайте", 'url_name': 'about'},
@@ -9,21 +9,7 @@ menu = [
     {'title': "Войти", 'url_name': 'login'},
 ]
 
-products = [
-    {
-        'id': 1,
-        'title': 'Стол из дуба',
-        'description': """
-Прочный и надёжный обеденный стол, выполненный из натурального дуба.  
-Идеально подходит для кухни или столовой в классическом и современном стиле.  
-Каждая деталь тщательно обработана вручную для сохранения текстуры древесины.  
-Покрытие на основе натурального масла защищает поверхность от влаги и повреждений.  
-Этот стол станет центром внимания в любом интерьере и прослужит десятилетия.""",
-        'is_published': True
-    },
-    {'id': 2, 'title': 'Шкаф из сосны', 'description': 'Экологично', 'is_published': False},
-    {'id': 3, 'title': 'Кровать из ясеня', 'description': 'Крепкая конструкция', 'is_published': True},
-]
+Product.objects.filter(is_published=1)
 
 cats_db = [
     {'id': 1, 'name': 'Столы'},
@@ -32,6 +18,7 @@ cats_db = [
 ]
 
 def index(request):
+    products = Product.published.all()
     data = {
         'title': 'Главная страница',
         'menu': menu,
@@ -39,21 +26,13 @@ def index(request):
         'cat_selected': 0,
     }
     return render(request, 'woodmarket/index.html', data)
-
-
-def show_product(request, product_id):
-    product = next((p for p in products if p['id'] == product_id), None)
-
-    if product is None:
-        raise Http404("Товар не найден")
-
-    context = {
-        'title': product['title'],
+def show_product(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    return render(request, 'woodmarket/product.html', {
+        'title': product.title,
         'menu': menu,
         'product': product,
-    }
-    return render(request, 'woodmarket/index.html', context=context)
-
+    })
 
 def about(request):
     return render(request, 'woodmarket/about.html', {'title': 'О сайте', 'menu': menu})
@@ -67,8 +46,27 @@ def contact(request):
 def login(request):
     return HttpResponse("Войти")
 
-def categories(request):
- return HttpResponse("<h1>Статьи по категориям</h1>")
+def show_category(request, cat_id):
+    # Получаем название категории по id
+    cat = next((c for c in cats_db if c['id'] == cat_id), None)
+    if cat is None:
+        raise Http404("Категория не найдена")
+
+    # Фильтруем опубликованные товары по категории
+    filtered = [p for p in products if p['cat_id'] == cat_id and p['is_published']]
+
+    # Получаем описание первого продукта (если есть)
+    first_description = filtered[0]['description'] if filtered else 'Нет доступных товаров в этой категории.'
+
+    data = {
+        'title': f"Товары по категории {cat['name']}",
+        'menu': menu,
+        'products': filtered,
+        'cat_selected': cat_id,
+        'first_description': first_description,  # передаём в шаблон
+    }
+    return render(request, 'woodmarket/index.html', data)
+
 def categories_by_slug(request, cat_slug):
  if request.GET:
      print(request.GET)

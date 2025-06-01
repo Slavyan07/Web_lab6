@@ -23,7 +23,6 @@ handler404 = views.page_not_found
 urlpatterns = [
  path('admin/', admin.site.urls),
  path('', include('market.urls'),),
- path('market/', include('market.urls')),
 ]
 
 
