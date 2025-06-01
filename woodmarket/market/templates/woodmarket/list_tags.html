@@ -1,0 +1,16 @@
+<ul id="leftchapters">
+    <li><span style="color: #007bff;">Теги</span></li>
+    <li>
+        <div style="line-height: 1.6; font-size: 90%;">
+            {% for tag in tags %}
+                <a href="{% url 'tag' tag.slug %}" style="
+                    margin-right: 6px;
+                    text-decoration: none;
+                    color: #333;
+                ">{{ tag.name }}</a>
+            {% empty %}
+                <span>Нет тегов</span>
+            {% endfor %}
+        </div>
+    </li>
+</ul>

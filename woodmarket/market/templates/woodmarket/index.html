@@ -1,57 +1,25 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<!--  {% include 'woodmarket/includes/nav.html' %}-->
 
-  <h1>{{ title }}</h1>
+<h1>{{ title }}</h1>
 
-  <ul>
-    {% for product in products %}
-      {% if product.is_published %}
-        <li>
-          <h2>{{ product.title }}</h2>
-          <p>
-            {% autoescape off %}
-              {{ product.description|linebreaks|truncatewords:50 }}
-            {% endautoescape %}
-          </p>
-          <p><a href="{{ product.get_absolute_url }}">Читать подробнее</a></p>
-          {% if not forloop.last %}
-            <hr>
-          {% endif %}
-        </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+{% if posts %}
+    <ul class="post-list">
+        {% for p in posts %}
+            <li>
+                <div class="article-panel">
+                    <p class="first">Категория: {{ p.cat.name }}</p>
+                    <p class="last">Дата: {{ p.time_update|date:"d-m-Y H:i:s" }}</p>
+                </div>
+                <h2>{{ p.title }}</h2>
+                <p>{{ p.description }}</p>
+                <a href="{{ p.get_absolute_url }}">Читать подробнее</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет доступных продуктов в этой категории.</p>
+{% endif %}
 
-<!--  {% include 'woodmarket/includes/nav.html' %}-->
 {% endblock %}
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ main_title|default:"Без заголовка" }}</title>
-</head>
-<body>
-    <h1>{{ title|capfirst }}</h1>
-
-    <h2>Фильтры</h2>
-
-    <p><strong>Float + 50:</strong> {{ float|add:"50" }}</p>
-    <p><strong>Float делится на 2?</strong> {{ float|divisibleby:"2" }}</p>
-
-    <p><strong>Список:</strong> {{ lst }}</p>
-    <p><strong>Длина списка:</strong> {{ lst|length }}</p>
-
-    <p><strong>Первый элемент списка:</strong> {{ lst|first }}</p>
-    <p><strong>Последний элемент списка:</strong> {{ lst|last }}</p>
-
-    <p><strong>Меню:</strong> {{ menu|join:" | " }}</p>
-
-    <p><strong>Title в верхнем регистре:</strong> {{ title|upper }}</p>
-    <p><strong>Title без пробелов:</strong> {{ title|cut:" " }}</p>
-
-    <p><strong>Слаг URL:</strong> {{ url }}</p>
-</body>
-</html>

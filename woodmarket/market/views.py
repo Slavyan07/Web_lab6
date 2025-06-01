@@ -1,6 +1,6 @@
 from django.http import  HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product
+from .models import Product, Category, Tag
 # Create your views here.
 menu = [
     {'title': "О сайте", 'url_name': 'about'},
@@ -11,21 +11,20 @@ menu = [
 
 Product.objects.filter(is_published=1)
 
-cats_db = [
-    {'id': 1, 'name': 'Столы'},
-    {'id': 2, 'name': 'Шкафы'},
-    {'id': 3, 'name': 'Кровати'},
-]
+Categories = Category.objects.all()
 
 def index(request):
     products = Product.published.all()
-    data = {
+    categories = Category.objects.all()
+
+    context = {
         'title': 'Главная страница',
+        'posts': products,
+        'categories': categories,
         'menu': menu,
-        'products': products,
         'cat_selected': 0,
     }
-    return render(request, 'woodmarket/index.html', data)
+    return render(request, 'woodmarket/index.html', context)
 def show_product(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     return render(request, 'woodmarket/product.html', {
@@ -46,27 +45,31 @@ def contact(request):
 def login(request):
     return HttpResponse("Войти")
 
-def show_category(request, cat_id):
-    # Получаем название категории по id
-    cat = next((c for c in cats_db if c['id'] == cat_id), None)
-    if cat is None:
-        raise Http404("Категория не найдена")
+def show_category(request, cat_slug):
+    category = get_object_or_404(Category, slug=cat_slug)
+    posts = Product.objects.filter(cat_id=category.pk, is_published=True)
 
-    # Фильтруем опубликованные товары по категории
-    filtered = [p for p in products if p['cat_id'] == cat_id and p['is_published']]
-
-    # Получаем описание первого продукта (если есть)
-    first_description = filtered[0]['description'] if filtered else 'Нет доступных товаров в этой категории.'
-
-    data = {
-        'title': f"Товары по категории {cat['name']}",
+    context = {
         'menu': menu,
-        'products': filtered,
-        'cat_selected': cat_id,
-        'first_description': first_description,  # передаём в шаблон
+        'title': f'Рубрика: {category.name}',
+        'posts': posts,
+        'cat_selected': category.id,
     }
-    return render(request, 'woodmarket/index.html', data)
 
+    return render(request, 'woodmarket/index.html', context)
+def show_tag(request, tag_slug):
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    posts = tag.products.filter(is_published=True)
+    categories = Category.objects.all()
+
+    context = {
+        'title': f'Тег: {tag.name}',
+        'posts': posts,
+        'categories': categories,
+        'menu': menu,
+        'cat_selected': 0,
+    }
+    return render(request, 'woodmarket/index.html', context)
 def categories_by_slug(request, cat_slug):
  if request.GET:
      print(request.GET)

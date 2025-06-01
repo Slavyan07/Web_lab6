@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<p>Теги:
+    {% for tag in product.tags.all %}
+        <a href="{% url 'tag' tag.slug %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+    {% empty %}
+        нет
+    {% endfor %}
+</p>
 <h1>{{ product.title }}</h1>
 <p>{{ product.description|linebreaks }}</p>
 {% endblock %}

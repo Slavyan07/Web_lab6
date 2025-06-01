@@ -1,6 +1,17 @@
 <ul id="leftchapters">
-    <li class="selected">Все категории</li>
+    <li>
+        {% if cat_selected == 0 %}
+            <span style="color: #007bff;">Все категории</span>
+        {% else %}
+            <a href="{% url 'home' %}">Все категории</a>
+        {% endif %}
+    </li>
+
     {% for cat in cats %}
-        <li><a href="#">{{ cat.name }}</a></li>
+        {% if cat.id == cat_selected %}
+            <li class="selected">{{ cat.name }}</li>
+        {% else %}
+            <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+        {% endif %}
     {% endfor %}
 </ul>

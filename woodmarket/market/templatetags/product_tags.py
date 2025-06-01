@@ -1,13 +1,21 @@
 from django import template
 import market.views as views
+from market.models import Category, Tag
+from django.db.models import Count
 
 register = template.Library()
 
 @register.simple_tag()
 def get_categories():
- return views.cats_db
+ return views.Categories
 
 @register.inclusion_tag('woodmarket/list_categories.html')
 def show_product_categories(cat_selected=0):
-    cats = views.cats_db
+    cats = Category.objects.annotate(total=Count("products")).filter(total__gt=0)
     return {'cats': cats, 'cat_selected': cat_selected}
+
+@register.inclusion_tag('woodmarket/list_tags.html')
+def show_all_tags():
+    return {
+        "tags": Tag.objects.annotate(total=Count("products")).filter(total__gt=0)
+    }
