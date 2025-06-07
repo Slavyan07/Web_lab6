@@ -71,14 +71,14 @@ def show_tag(request, tag_slug):
     }
     return render(request, 'woodmarket/index.html', context)
 def categories_by_slug(request, cat_slug):
- if request.GET:
-     print(request.GET)
- return HttpResponse("<h1>Статьи по категориям</h1>")
+    if request.GET:
+        print(request.GET)
+        return HttpResponse("<h1>Статьи по категориям</h1>")
 
 def page_not_found(request, exception):
- return HttpResponseNotFound('<h1>Страница не найдена</h1>')
+    return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
 def archive(request, year):
- if year > 2025:
-     return redirect('home', permanent=True)
- return HttpResponse(f"<h1>Архив по годам</h1><p>{year}</p>")
+    if year > 2025:
+        return redirect('home', permanent=True)
+    return HttpResponse(f"<h1>Архив по годам</h1><p>{year}</p>")

@@ -15,14 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
 from django.urls import path, include
 from market import views
 handler404 = views.page_not_found
+from django.contrib import admin
+import debug_toolbar
+
+admin.site.site_header = "Панель администрирования"
+admin.site.index_title = "Изделия из дерева"
 
 urlpatterns = [
  path('admin/', admin.site.urls),
  path('', include('market.urls'),),
+ path('__debug__/', include(debug_toolbar.urls)),
 ]
 
 

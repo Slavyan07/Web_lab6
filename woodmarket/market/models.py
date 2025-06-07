@@ -14,8 +14,12 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 class Category(models.Model):
-    name = models.CharField(max_length=100, db_index=True)
-    slug = models.SlugField(max_length=255, unique=True, db_index=True)
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+
+    name = models.CharField(max_length=100, db_index=True, verbose_name="Категория")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     def get_absolute_url(self):
         return reverse('cat_slug', kwargs={'cat_slug': self.slug})
@@ -35,22 +39,31 @@ class Product(models.Model):
 
     objects = models.Manager()  # обычный менеджер
     published = PublishedManager()
-    title = models.CharField(max_length=255)
-    tags = models.ManyToManyField('Tag', blank=True, related_name='products')
-    cat = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    slug = models.SlugField(max_length=255, unique=True, db_index=True)
-    description = models.TextField(blank=True)
-    time_create = models.DateTimeField(auto_now_add=True)
-    time_update = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(choices=Status.choices, default=Status.DRAFT)
-    details = models.OneToOneField(ProductDetails, on_delete=models.SET_NULL, null=True, blank=True)
+    title = models.CharField(max_length=255, verbose_name="Название")
+    tags = models.ManyToManyField('Tag', blank=True, related_name='products', verbose_name="Теги")
+    cat = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products', verbose_name="Категория")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
+    time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
+    is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)), default=Status.DRAFT, verbose_name="Статус")
+    details = models.OneToOneField(ProductDetails, on_delete=models.PROTECT,  null=True, blank=True, verbose_name="Характеристики")
 
     class Meta:
+        verbose_name = "Изделия"
+        verbose_name_plural = "Изделия"
         ordering = ['-time_create']
         indexes = [
             models.Index(fields=['-time_create']),
         ]
-
+    def save(self, *args, **kwargs):
+         if self.details is None:
+             self.details = ProductDetails.objects.create(
+                 material="Не указано",
+                 size="Не указано",
+                 warranty_years=2
+             )
+         super().save(*args, **kwargs)
     def get_absolute_url(self):
         return reverse('product', kwargs={'product_slug': self.slug})
 
