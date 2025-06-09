@@ -7,11 +7,16 @@
 {% if posts %}
     <ul class="post-list">
         {% for p in posts %}
-            <li>
+           <li style="list-style: none; margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 20px;">
                 <div class="article-panel">
-                    <p class="first">Категория: {{ p.cat.name }}</p>
-                    <p class="last">Дата: {{ p.time_update|date:"d-m-Y H:i:s" }}</p>
+                    <p class="first" style="margin: 0; font-weight: bold;">Категория: {{ p.cat.name }}</p>
+                    <p class="last" style="margin: 0; font-size: 0.9em; color: #666;">
+                        Дата: {{ p.time_update|date:"d-m-Y H:i:s" }}
                 </div>
+                {% if p.photo %}
+                <p ><img class="img-article-left
+                thumb" src="{{p.photo.url}}"></p>
+                {% endif %}
                 <h2>{{ p.title }}</h2>
                 <p>{{ p.description }}</p>
                 <a href="{{ p.get_absolute_url }}">Читать подробнее</a>
